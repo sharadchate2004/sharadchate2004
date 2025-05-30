@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Authentication Portal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e0f7fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #00796b;
+    }
+
+    .box {
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #00796b;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #004d40;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Authentication Portal</h2>
+
+    <div class="box" id="register">
+      <h3>Register</h3>
+      <input type="text" id="reg-username" placeholder="Username" />
+      <input type="email" id="reg-email" placeholder="Email" />
+      <input type="password" id="reg-password" placeholder="Password" />
+      <button onclick="register()">Register</button>
+    </div>
+
+    <div class="box" id="login">
+      <h3>Login</h3>
+      <input type="text" id="login-username" placeholder="Username" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+    </div>
+
+    <p id="message"></p>
+  </div>
+
+  <script>
+    function register() {
+      const username = document.getElementById("reg-username").value.trim();
+      const email = document.getElementById("reg-email").value.trim();
+      const password = document.getElementById("reg-password").value.trim();
+
+      if (!username || !email || !password) {
+        showMessage("❌ Please fill all fields.");
+        return;
+      }
+
+      if (!validateEmail(email)) {
+        showMessage(
+          "❌ Invalid email format. It must include '@', 'gmail.com', and be at least 10 characters with 3 digits."
+        );
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        showMessage(
+          "❌ Password must be at least 6 characters and contain at least three numbers."
+        );
+        return;
+      }
+
+      const user = { username, email, password };
+      localStorage.setItem("user", JSON.stringify(user));
+      showMessage("✅ Registered successfully. Now login.");
+      document.getElementById("message").style.color = "#388e3c";
+
+      // Optional: Clear registration fields after successful register
+      document.getElementById("reg-username").value = "";
+      document.getElementById("reg-email").value = "";
+      document.getElementById("reg-password").value = "";
+    }
+
+    function login() {
+      const loginUsername = document.getElementById("login-username").value.trim();
+      const loginPassword = document.getElementById("login-password").value.trim();
+
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+
+      if (!storedUser) {
+        showMessage("❌ No user found. Please register first.");
+        document.getElementById("message").style.color = "#d32f2f";
+        return;
+      }
+
+      if (
+        loginUsername === storedUser.username &&
+        loginPassword === storedUser.password
+      ) {
+        showMessage("✅ Login successful! Welcome, " + storedUser.username);
+        document.getElementById("message").style.color = "#388e3c";
+
+        // Optional: Clear login fields after success
+        document.getElementById("login-username").value = "";
+        document.getElementById("login-password").value = "";
+      } else {
+        showMessage("❌ Invalid username or password.");
+        document.getElementById("message").style.color = "#d32f2f";
+      }
+    }
+
+    function validateEmail(email) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      const digitCount = (email.match(/\d/g) || []).length;
+      return (
+        email.length >= 10 &&
+        email.includes("@") &&
+        email.includes("gmail.com") &&
+        digitCount >= 3 &&
+        emailRegex.test(email)
+      );
+    }
+
+    function validatePassword(password) {
+      const digitCount = (password.match(/\d/g) || []).length;
+      return password.length >= 6 && digitCount >= 3;
+    }
+
+    function showMessage(msg) {
+      const messageElem = document.getElementById("message");
+      messageElem.innerText = msg;
+    }
+  </script>
+</body>
+</html>
